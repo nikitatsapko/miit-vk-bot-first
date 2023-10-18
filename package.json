@@ -1,0 +1,25 @@
+{
+  "name": "miit-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikitatsapko/miit-vk-bot-first.git"
+  },
+  "author": "Nikita Tsapko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nikitatsapko/miit-vk-bot-first/issues"
+  },
+  "homepage": "https://github.com/nikitatsapko/miit-vk-bot-first#readme",
+  "dependencies": {
+    "@vk-io/hear": "^1.1.1",
+    "fs": "^0.0.1-security",
+    "vk-io": "^4.8.3",
+    "vk-io-question": "^4.0.0"
+  }
+}

@@ -1,0 +1,17 @@
+[
+	{
+		"id": 242505005,
+		"uid": 1,
+		"regDate": "18.9.2023",
+		"literature": [
+			true,
+			false,
+			false
+		],
+		"tests": [
+			false,
+			false,
+			false
+		]
+	}
+]
