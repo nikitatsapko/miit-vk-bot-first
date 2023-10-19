@@ -2,8 +2,13 @@
 	{
 		"id": 242505005,
 		"uid": 1,
-		"regDate": "18.9.2023",
+		"regDate": "19.9.2023",
 		"literature": [
+			true,
+			false,
+			false
+		],
+		"allowed_tests": [
 			true,
 			false,
 			false
@@ -12,6 +17,26 @@
 			false,
 			false,
 			false
+		]
+	},
+	{
+		"id": 391723632,
+		"uid": 2,
+		"regDate": "20.9.2023",
+		"literature": [
+			true,
+			true,
+			true
+		],
+		"allowed_tests": [
+			true,
+			true,
+			true
+		],
+		"tests": [
+			true,
+			true,
+			true
 		]
 	}
 ]
