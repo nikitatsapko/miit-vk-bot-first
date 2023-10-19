@@ -544,22 +544,4 @@ hearCommand("time", ["/time", "/date"], async (context) => {
     await context.send(String(new Date()));
 });
 
-/*const catsPurring = [
-    "http://ronsen.org/purrfectsounds/purrs/trip.mp3",
-    "http://ronsen.org/purrfectsounds/purrs/maja.mp3",
-    "http://ronsen.org/purrfectsounds/purrs/chicken.mp3"
-];
-
-hearCommand("purr", async (context) => {
-    const link = catsPurring[Math.floor(Math.random() * catsPurring.length)];
-
-    await Promise.all([
-        context.send("Wait for the uploads purring 😻"),
-
-        context.sendAudioMessage({
-            value: link
-        })
-    ]);
-});*/
-
 vk.updates.start().catch(console.error);
