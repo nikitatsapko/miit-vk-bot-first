@@ -2,6 +2,7 @@ let users = require("./database/users.json")
 let config = require("./database/config.json")
 let tests = require("./database/tests.json")
 let literature = require("./database/literature.json")
+let package = require("./package.json")
 
 const { VK, Keyboard } = require("vk-io");
 const vk = new VK({
@@ -18,7 +19,7 @@ console.log('')
 console.log('-------------------------------')
 console.log('  Бот УИС-111 | ПЕРВЫЙ ПРОЕКТ запущен.')
 console.log('  Разработчик: Никита Цапко')
-console.log('  vk.com/nightday13')
+console.log('  Версия: ' + package.version)
 
 console.log('-------------------------------')
 console.log('')
@@ -456,7 +457,7 @@ hearCommand("go_test", async (context) => {
 	for(i = 0; i < tests[item].questions.length; i++) {
 		let text = `❓️ Вопрос №${i+1}: ${tests[item].questions[i]}\n\nВарианты ответов:\n`
 		let keyboard = Keyboard.builder()
-		for(j = 0; j < tests[item].variables.length; j++) {
+		for(j = 0; j < tests[item].variables[i].length; j++) {
 			text += `* ${tests[item].variables[i][j]} *\n`
 			keyboard = keyboard.row().textButton({
                 label: tests[item].variables[i][j],
@@ -478,13 +479,16 @@ hearCommand("go_test", async (context) => {
 		return context.send("Ошибка №3")
 	let pr = 0
 	let kol = 0
+	let errors = []
 	for(i = 0; i < answers.length; i++) {
 		if (answers[i] == tests[item].answers[i])
 			kol += 1
+		else
+			errors.push(i)
 	}
 	pr = kol / answers.length
 	pr_n = Math.ceil(pr * 100)
-	if (pr < 0.5) {
+	if (pr < 0.64) {
 		return context.send
 		({ 
 			message: `❌ Тест не сдан, вы должны его пересдать.\nВы сдали тест на ${pr_n}%.`,
@@ -528,6 +532,12 @@ hearCommand("go_test", async (context) => {
 	    })
 	    text += `\n🥳 Поздравляем! Вы прошли весь курс!`
 	}
+	if (pr != 1) {
+    	text += `\n\nВаши ошибки в тесте: `
+    	for(i = 0; i < errors.length; i++) {
+    		text += `\n❌ Вопрос №${errors[i]+1}: ${tests[item].questions[errors[i]]}`
+    	}
+    }
 	keyboard = keyboard.row().textButton({
         label: "Назад",
         payload: {

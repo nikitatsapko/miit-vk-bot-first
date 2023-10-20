@@ -14,7 +14,7 @@
 			false
 		],
 		"tests": [
-			false,
+			true,
 			false,
 			false
 		]
