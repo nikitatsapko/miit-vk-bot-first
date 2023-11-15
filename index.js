@@ -480,11 +480,20 @@ hearCommand("go_test", async (context) => {
 	let pr = 0
 	let kol = 0
 	let errors = []
+	// проверка ответов на правильность
 	for(i = 0; i < answers.length; i++) {
-		if (answers[i] == tests[item].answers[i])
-			kol += 1
-		else
-			errors.push(i)
+		if (Array.isArray(tests[item].answers[i])) {
+			if (tests[item].answers[i].some(t => t === answers[i]))
+				kol += 1
+			else
+				errors.push(i)
+		}
+		else {
+			if (answers[i] == tests[item].answers[i])
+				kol += 1
+			else
+				errors.push(i)
+		}
 	}
 	pr = kol / answers.length
 	pr_n = Math.ceil(pr * 100)
