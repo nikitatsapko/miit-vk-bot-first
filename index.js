@@ -3,11 +3,22 @@ let config = require("./database/config.json")
 let tests = require("./database/tests.json")
 let literature = require("./database/literature.json")
 let package = require("./package.json")
+let dotenv = require("dotenv").config()
 
-const { VK, Keyboard } = require("vk-io");
+const { VK, Keyboard, API, Upload } = require("vk-io");
+
 const vk = new VK({
     token: config.grouptoken
 });
+
+const api = new API({
+    token: process.env.TOKEN
+});
+
+const upload = new Upload({
+    api
+});
+
 const { HearManager } = require("@vk-io/hear");
 const { QuestionManager } = require('vk-io-question');
 const commands = []
@@ -346,7 +357,8 @@ hearCommand("tests", async (context) => {
 			text += no
 		else
 			text += yes
-		text += ` №${i+1}: ${literature[i].name}\n`
+		//text += ` №${i+1}: ${literature[i].name}\n`
+		text += `Тест по главе №${i+1}\n`
 	}
 	let keyboard = Keyboard.builder()
 	for(i = 0; i < tests.length; i++) {
@@ -455,19 +467,33 @@ hearCommand("go_test", async (context) => {
 	let answers = []
 	await context.send(`Загрузка теста №${item+1}...`)
 	for(i = 0; i < tests[item].questions.length; i++) {
-		let text = `❓️ Вопрос №${i+1}: ${tests[item].questions[i]}\n\nВарианты ответов:\n`
+		let text = `❓️ Вопрос №${i+1}: ${tests[item].questions[i]}\n\nВарианты ответов:\n\n`
 		let keyboard = Keyboard.builder()
 		for(j = 0; j < tests[item].variables[i].length; j++) {
-			text += `* ${tests[item].variables[i][j]} *\n`
+			text += `${j+1}) ${tests[item].variables[i][j]}\n\n`
+			let label = (j+1)+". "+tests[item].variables[i][j]
+			label = label.slice(0,34);
+			if (label.length < tests[item].variables[i][j].length)
+				label += '...';
 			keyboard = keyboard.row().textButton({
-                label: tests[item].variables[i][j],
+                label: label,
                 payload: {
                 	item: j
                 },
                 color: Keyboard.PRIMARY_COLOR
             })
 		}
-		let answer = await context.question(text, { keyboard: keyboard })
+		let answer
+		if(tests[item].attachments[i] == null)
+			answer = await context.question(text, { keyboard: keyboard })
+		else {
+			const attachment = await upload.messagePhoto({
+			    source: {
+			        value: tests[item].attachments[i]
+			    }
+			})
+			answer = await context.question(text, { keyboard: keyboard, attachment })
+		}
 	    if (!answer.messagePayload) {
 	        await context.send('Отвечать нужно нажатием на кнопку.')
 	        i--
