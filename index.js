@@ -5,19 +5,19 @@ let literature = require("./database/literature.json")
 let package = require("./package.json")
 let dotenv = require("dotenv").config()
 
-const { VK, Keyboard, API, Upload } = require("vk-io");
+const { VK, Keyboard, API, Upload, Attachment } = require("vk-io");
 
 const vk = new VK({
     token: config.grouptoken
-});
+})
 
 const api = new API({
     token: process.env.TOKEN
-});
+})
 
 const upload = new Upload({
     api
-});
+})
 
 const { HearManager } = require("@vk-io/hear");
 const { QuestionManager } = require('vk-io-question');
@@ -244,7 +244,7 @@ hearCommand("get_literature", async (context) => {
 	let item = context.messagePayload.item
 	if (item != 0) {
 		if (user.literature[item-1] == false) {
-			let text = `Для прохождения темы "${literature[item].name}" вы должны пройти "${literature[item-1].name}"`
+			let text = `Для прохождения темы "${literature[item].name}" вы должны пройти тему "${literature[item-1].name}"`
 			await context.send({message: text,
 	        	keyboard: Keyboard.builder().textButton({
 			        label: `Перейти к теме "${literature[item-1].name}"`,
@@ -286,7 +286,18 @@ hearCommand("get_literature", async (context) => {
 	        return false
 		}
 	}
-	let text = `📖 Материал по теме: ${literature[item].name} (№${item+1})\n\n${literature[item].text}`
+	let text = `📖 Материал по теме: ${literature[item].name}${literature[item].text}`
+	let doc
+	if (literature[item].attachment == null)
+		doc = null
+	else
+		doc = new Attachment({
+			type: 'doc',
+			payload: {
+				id: literature[item].attachment,
+				owner_id: -223040072,
+			},
+		}).toString()
 	await Promise.all([
         await context.send({message: text,
         	keyboard: Keyboard.builder().textButton({
@@ -303,10 +314,11 @@ hearCommand("get_literature", async (context) => {
 		        	command: "literature"
 		        },
 		        color: Keyboard.SECONDARY_COLOR
-		    })
+		    }), 
+			attachment: doc
         }),
     ])
-});
+})
 
 hearCommand("done_literature", async (context) => {
 	let user = users.find(x=> x.id === context.senderId)
@@ -358,7 +370,7 @@ hearCommand("tests", async (context) => {
 		else
 			text += yes
 		//text += ` №${i+1}: ${literature[i].name}\n`
-		text += `Тест по главе №${i+1}\n`
+		text += `№${i+1}: ${literature[i].name}\n`
 	}
 	let keyboard = Keyboard.builder()
 	for(i = 0; i < tests.length; i++) {
@@ -487,7 +499,7 @@ hearCommand("go_test", async (context) => {
 		if(tests[item].attachments[i] == null)
 			answer = await context.question(text, { keyboard: keyboard })
 		else {
-			const attachment = await upload.messagePhoto({
+			const attachment= await upload.messagePhoto({
 			    source: {
 			        value: tests[item].attachments[i]
 			    }

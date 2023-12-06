@@ -14,7 +14,7 @@
 			false
 		],
 		"tests": [
-			true,
+			false,
 			false,
 			false
 		]
@@ -24,19 +24,59 @@
 		"uid": 2,
 		"regDate": "20.9.2023",
 		"literature": [
-			true,
-			true,
-			true
+			false,
+			false,
+			false
 		],
 		"allowed_tests": [
-			true,
-			true,
-			true
+			false,
+			false,
+			false
 		],
 		"tests": [
-			true,
-			true,
-			true
+			false,
+			false,
+			false
+		]
+	},
+	{
+		"id": 391686995,
+		"uid": 3,
+		"regDate": "6.11.2023",
+		"literature": [
+			false,
+			false,
+			false
+		],
+		"allowed_tests": [
+			false,
+			false,
+			false
+		],
+		"tests": [
+			false,
+			false,
+			false
+		]
+	},
+	{
+		"id": 749300364,
+		"uid": 4,
+		"regDate": "6.11.2023",
+		"literature": [
+			false,
+			false,
+			false
+		],
+		"allowed_tests": [
+			false,
+			false,
+			false
+		],
+		"tests": [
+			false,
+			false,
+			false
 		]
 	}
 ]
