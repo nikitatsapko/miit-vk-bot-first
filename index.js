@@ -499,7 +499,7 @@ hearCommand("go_test", async (context) => {
 		if(tests[item].attachments[i] == null)
 			answer = await context.question(text, { keyboard: keyboard })
 		else {
-			const attachment= await upload.messagePhoto({
+			const attachment = await upload.messagePhoto({
 			    source: {
 			        value: tests[item].attachments[i]
 			    }
