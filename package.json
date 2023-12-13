@@ -1,6 +1,6 @@
 {
   "name": "miit-bot",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,7 @@
     "@vk-io/hear": "^1.1.1",
     "dotenv": "^16.3.1",
     "fs": "^0.0.1-security",
+    "request": "^2.88.2",
     "vk-io": "^4.8.3",
     "vk-io-question": "^4.0.0"
   }

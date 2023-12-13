@@ -5,16 +5,16 @@
 		"regDate": "19.9.2023",
 		"literature": [
 			true,
-			false,
-			false
+			true,
+			true
 		],
 		"allowed_tests": [
 			true,
-			false,
-			false
+			true,
+			true
 		],
 		"tests": [
-			false,
+			true,
 			false,
 			false
 		]
@@ -24,12 +24,12 @@
 		"uid": 2,
 		"regDate": "20.9.2023",
 		"literature": [
-			false,
+			true,
 			false,
 			false
 		],
 		"allowed_tests": [
-			false,
+			true,
 			false,
 			false
 		],
@@ -70,6 +70,46 @@
 		],
 		"allowed_tests": [
 			false,
+			false,
+			false
+		],
+		"tests": [
+			false,
+			false,
+			false
+		]
+	},
+	{
+		"id": 576680359,
+		"uid": 5,
+		"regDate": "13.11.2023",
+		"literature": [
+			false,
+			false,
+			false
+		],
+		"allowed_tests": [
+			false,
+			false,
+			false
+		],
+		"tests": [
+			false,
+			false,
+			false
+		]
+	},
+	{
+		"id": 361566174,
+		"uid": 6,
+		"regDate": "13.11.2023",
+		"literature": [
+			true,
+			false,
+			false
+		],
+		"allowed_tests": [
+			true,
 			false,
 			false
 		],

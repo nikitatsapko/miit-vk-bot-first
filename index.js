@@ -4,8 +4,9 @@ let tests = require("./database/tests.json")
 let literature = require("./database/literature.json")
 let package = require("./package.json")
 let dotenv = require("dotenv").config()
+let request = require('request')
 
-const { VK, Keyboard, API, Upload, Attachment } = require("vk-io");
+const { VK, Keyboard, API, Upload, Attachment } = require("vk-io")
 
 const vk = new VK({
     token: config.grouptoken
@@ -19,12 +20,12 @@ const upload = new Upload({
     api
 })
 
-const { HearManager } = require("@vk-io/hear");
-const { QuestionManager } = require('vk-io-question');
+const { HearManager } = require("@vk-io/hear")
+const { QuestionManager } = require('vk-io-question')
 const commands = []
 
-const hearManager = new HearManager();
-const questionManager = new QuestionManager();
+const hearManager = new HearManager()
+const questionManager = new QuestionManager()
 
 console.log('')
 console.log('-------------------------------')
@@ -50,7 +51,7 @@ async function saveConfig()
 
 function getTime() {
 	let date = new Date()
-	var time=("0"  + date.getHours()).slice(-2)+":"+("0"  + date.getMinutes()).slice(-2)+":"+("0" + date.getSeconds()).slice(-2);
+	var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2) + ":" + ("0" + date.getSeconds()).slice(-2)
 	return time
 }
 
@@ -61,8 +62,8 @@ setInterval(async () => {
 vk.updates.on("message_new", async (context, next) => {
 	if(!users.find(x=> x.id === context.senderId))
 	{
-		const [user_info] = await vk.api.users.get({ user_id: context.senderId });
-		const date = new Date();
+		const [user_info] = await vk.api.users.get({ user_id: context.senderId })
+		const date = new Date()
 
 		users.push({
 			id: context.senderId,
@@ -71,37 +72,37 @@ vk.updates.on("message_new", async (context, next) => {
 			literature: [false, false, false],
 			allowed_tests: [false, false, false],
 			tests: [false, false, false]
-		});
-		console.log(`[${getTime()}] Зарегистрирован новый пользователь. ID: ${users.length}. VK: ${context.senderId}`);
-		saveUsers();
+		})
+		console.log(`[${getTime()}] Зарегистрирован новый пользователь. ID: ${users.length}. VK: ${context.senderId}`)
+		saveUsers()
 
 		context.state.command = "start"
-		return next();
+		return next()
 	}
 	else {
-		const { messagePayload } = context;
+		const { messagePayload } = context
 
 	    context.state.command = messagePayload && messagePayload.command
 	        ? messagePayload.command
-	        : null;
+	        : null
 
-	    return next();
+	    return next()
 	}
-});
+})
 
 //========================
 
-vk.updates.use(questionManager.middleware);
-vk.updates.on("message_new", hearManager.middleware);
+vk.updates.use(questionManager.middleware)
+vk.updates.on("message_new", hearManager.middleware)
 
 const hearCommand = (name, conditions, handle) => {
     if (typeof handle !== "function") {
-        handle = conditions;
-        conditions = [`${name}`, `/${name}`];
+        handle = conditions
+        conditions = [`${name}`, `/${name}`]
     }
 
     if (!Array.isArray(conditions)) {
-        conditions = [conditions];
+        conditions = [conditions]
     }
 
     hearManager.hear(
@@ -112,18 +113,18 @@ const hearCommand = (name, conditions, handle) => {
             ...conditions
         ],
         handle
-    );
-};
+    )
+}
 
 hearCommand("start", ["Начать", "start", "/start"], (context, next) => {
-    context.state.command = "help";
+    context.state.command = "help"
 
     return Promise.all([
         context.send("Добро пожаловать!"),
 
         next()
-    ]);
-});
+    ])
+})
 
 hearCommand("help", async (context) => {
     await context.send({
@@ -147,8 +148,8 @@ hearCommand("help", async (context) => {
                 },
                 color: Keyboard.PRIMARY_COLOR
             })
-    });
-});
+    })
+})
 
 hearCommand("literature", async (context) => {
 	let yes = "✅"
@@ -236,8 +237,8 @@ hearCommand("literature", async (context) => {
         await context.send({message: text,
         	keyboard: keyboard
         }),
-    ]);
-});
+    ])
+})
 
 hearCommand("get_literature", async (context) => {
 	let user = users.find(x=> x.id === context.senderId)
@@ -484,9 +485,9 @@ hearCommand("go_test", async (context) => {
 		for(j = 0; j < tests[item].variables[i].length; j++) {
 			text += `${j+1}) ${tests[item].variables[i][j]}\n\n`
 			let label = (j+1)+". "+tests[item].variables[i][j]
-			label = label.slice(0,34);
+			label = label.slice(0,34)
 			if (label.length < tests[item].variables[i][j].length)
-				label += '...';
+				label += '...'
 			keyboard = keyboard.row().textButton({
                 label: label,
                 payload: {
@@ -592,13 +593,60 @@ hearCommand("go_test", async (context) => {
         },
         color: Keyboard.SECONDARY_COLOR
     })
-	await context.send({ message: text, keyboard: keyboard })
+	
+	// генерация и отправка сертификата
+	let [userData] = await vk.api.users.get({user_id: context.senderId})
+
+	function formatDate(date) {
+		var dd = date.getDate()
+		if (dd < 10) dd = '0' + dd
+	  
+		var mm = date.getMonth() + 1
+		if (mm < 10) mm = '0' + mm
+	  
+		var yy = date.getFullYear() % 100
+		if (yy < 10) yy = '0' + yy
+	  
+		return dd + '.' + mm + '.' + '20' + yy
+	}
+
+	let date = new Date()
+	let vars = [{"%фио": `${userData.first_name} ${userData.last_name}`, "%приказ": user.uid, "%дата": formatDate(date)}]
+	let args = {"secure": process.env.GRTOKEN, "mask": JSON.stringify(vars), "doc_id": "c85da14c-e64c-48c8-b982-fca051b3d535"}
+
+	await request.post(
+		'https://gramotadel.express/api/v1/create/',
+		{ json: args },
+		async function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				if (body.result != "success")
+					return await context.send("🥳 Поздравляем! Вы прошли весь курс!\n\nПри загрузке сертификата произошла ошибка.")
+
+				let keyboard = Keyboard.builder()
+				keyboard = keyboard.textButton({
+					label: `Поздравляем! Вы прошли весь курс!`,
+					payload: {
+						command: "help"
+					},
+					color: Keyboard.POSITIVE_COLOR
+				})
+
+				let text = "🥳 Поздравляем! Вы прошли весь курс!"
+				let certificate = "https://gramotadel.express/getfile/" + body.files[0] + "/"
+
+				let link_cc = await vk.api.utils.getShortLink({ url: certificate })
+				text += "\n\nВы можете скачать сертификат о прохождении курса: " + link_cc.short_url
+
+				await context.send({ message: text, keyboard: keyboard })
+			}
+			else {
+				return console.log('error with request to get a certificate')
+			}
+		}
+	)
+
 	user.tests[item] = true
 	saveUsers()
 })
 
-hearCommand("time", ["/time", "/date"], async (context) => {
-    await context.send(String(new Date()));
-});
-
-vk.updates.start().catch(console.error);
+vk.updates.start().catch(console.error)
