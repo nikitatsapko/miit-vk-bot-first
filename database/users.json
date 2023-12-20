@@ -15,8 +15,8 @@
 		],
 		"tests": [
 			true,
-			false,
-			false
+			true,
+			true
 		]
 	},
 	{
@@ -64,12 +64,12 @@
 		"uid": 4,
 		"regDate": "6.11.2023",
 		"literature": [
-			false,
+			true,
 			false,
 			false
 		],
 		"allowed_tests": [
-			false,
+			true,
 			false,
 			false
 		],
@@ -110,6 +110,26 @@
 		],
 		"allowed_tests": [
 			true,
+			false,
+			false
+		],
+		"tests": [
+			false,
+			false,
+			false
+		]
+	},
+	{
+		"id": 326496322,
+		"uid": 7,
+		"regDate": "19.11.2023",
+		"literature": [
+			false,
+			false,
+			false
+		],
+		"allowed_tests": [
+			false,
 			false,
 			false
 		],

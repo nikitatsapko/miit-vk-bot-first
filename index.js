@@ -562,7 +562,7 @@ hearCommand("go_test", async (context) => {
 	if (item < tests.length-1) {
 		text += `\nВы можете перейти к изучению следующей темы "${literature[item+1].name}"`
 		keyboard = keyboard.textButton({
-	        label: `Тема "${literature[item+1].name}"`,
+	        label: `Тема "${literature[item+1].short}"`,
 	        payload: {
 	        	command: "get_literature",
 	        	item: item+1
@@ -578,7 +578,57 @@ hearCommand("go_test", async (context) => {
 	        },
 	        color: Keyboard.POSITIVE_COLOR
 	    })
-	    text += `\n🥳 Поздравляем! Вы прошли весь курс!`
+		
+		// генерация и отправка сертификата
+		let [userData] = await vk.api.users.get({user_id: context.senderId})
+
+		function formatDate(date) {
+			var dd = date.getDate()
+			if (dd < 10) dd = '0' + dd
+		  
+			var mm = date.getMonth() + 1
+			if (mm < 10) mm = '0' + mm
+		  
+			var yy = date.getFullYear() % 100
+			if (yy < 10) yy = '0' + yy
+		  
+			return dd + '.' + mm + '.' + '20' + yy
+		}
+
+		let date = new Date()
+		let vars = [{"%фио": `${userData.first_name} ${userData.last_name}`, "%приказ": user.uid, "%дата": formatDate(date)}]
+		let args = {"secure": process.env.GRTOKEN, "mask": JSON.stringify(vars), "doc_id": "c85da14c-e64c-48c8-b982-fca051b3d535"}
+
+		await request.post(
+			'https://gramotadel.express/api/v1/create/',
+			{ json: args },
+			async function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					if (body.result != "success")
+						return await context.send("🥳 Поздравляем! Вы прошли весь курс!\n\nПри загрузке сертификата произошла ошибка.")
+
+					let keyboard = Keyboard.builder()
+					keyboard = keyboard.textButton({
+						label: `Поздравляем! Вы прошли весь курс!`,
+						payload: {
+							command: "help"
+						},
+						color: Keyboard.POSITIVE_COLOR
+					})
+
+					let text = "🥳 Поздравляем! Вы прошли весь курс!"
+					let certificate = "https://gramotadel.express/getfile/" + body.files[0] + "/"
+
+					let link_cc = await vk.api.utils.getShortLink({ url: certificate })
+					text += "\n\nВы можете скачать сертификат о прохождении курса: " + link_cc.short_url
+
+					await context.send({ message: text, keyboard: keyboard })
+				}
+				else {
+					return console.log('error with request to get a certificate')
+				}
+			}
+		)
 	}
 	if (pr != 1) {
     	text += `\n\nВаши ошибки в тесте: `
@@ -594,56 +644,7 @@ hearCommand("go_test", async (context) => {
         color: Keyboard.SECONDARY_COLOR
     })
 	
-	// генерация и отправка сертификата
-	let [userData] = await vk.api.users.get({user_id: context.senderId})
-
-	function formatDate(date) {
-		var dd = date.getDate()
-		if (dd < 10) dd = '0' + dd
-	  
-		var mm = date.getMonth() + 1
-		if (mm < 10) mm = '0' + mm
-	  
-		var yy = date.getFullYear() % 100
-		if (yy < 10) yy = '0' + yy
-	  
-		return dd + '.' + mm + '.' + '20' + yy
-	}
-
-	let date = new Date()
-	let vars = [{"%фио": `${userData.first_name} ${userData.last_name}`, "%приказ": user.uid, "%дата": formatDate(date)}]
-	let args = {"secure": process.env.GRTOKEN, "mask": JSON.stringify(vars), "doc_id": "c85da14c-e64c-48c8-b982-fca051b3d535"}
-
-	await request.post(
-		'https://gramotadel.express/api/v1/create/',
-		{ json: args },
-		async function (error, response, body) {
-			if (!error && response.statusCode == 200) {
-				if (body.result != "success")
-					return await context.send("🥳 Поздравляем! Вы прошли весь курс!\n\nПри загрузке сертификата произошла ошибка.")
-
-				let keyboard = Keyboard.builder()
-				keyboard = keyboard.textButton({
-					label: `Поздравляем! Вы прошли весь курс!`,
-					payload: {
-						command: "help"
-					},
-					color: Keyboard.POSITIVE_COLOR
-				})
-
-				let text = "🥳 Поздравляем! Вы прошли весь курс!"
-				let certificate = "https://gramotadel.express/getfile/" + body.files[0] + "/"
-
-				let link_cc = await vk.api.utils.getShortLink({ url: certificate })
-				text += "\n\nВы можете скачать сертификат о прохождении курса: " + link_cc.short_url
-
-				await context.send({ message: text, keyboard: keyboard })
-			}
-			else {
-				return console.log('error with request to get a certificate')
-			}
-		}
-	)
+	await context.send({ message: text, keyboard: keyboard })
 
 	user.tests[item] = true
 	saveUsers()
